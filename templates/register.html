@@ -1,7 +1,9 @@
 <!-- author ben lawson balawson@bu.edu -->
-<head>
+<!--head>
     <title>Create an account!</title>
+   
 </head>
+
 {%if not supress%}
 <h1> Email already in use! Use another one or <a href="/login">login</a></h1>
 {% endif %}
@@ -19,4 +21,19 @@
             </form>
          </div>
     </body>
-<a href='/'>Home</a>
+<a href='/'>Home</a-->
+
+<body>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/registrationstyle.css') }}">
+  <div class="container">
+    <div id="logbox">
+      <form id="signup" method="post" action="{{ url_for('register_user') }}">
+        <h1>Create an account</h1>
+        <input name="username" type="text" placeholder="What's your username?" pattern="^[\w]{3,16}$" autofocus="autofocus" required="required" class="input pass"/>
+        <input name="password" type="password" placeholder="Choose a password" required="required" class="input pass"/>
+        <input name="email" type="email" placeholder="Email address (required)" class="input pass"/>
+        <input type="submit" value="Sign me up!" class="inputButton"/>
+      </form>
+    </div>
+  </div>
+</body>

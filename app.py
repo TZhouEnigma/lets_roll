@@ -23,7 +23,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_PASSWORD'] = 'DADADA'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -79,14 +79,8 @@ def new_page_function():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if flask.request.method == 'GET':
-        return '''
-               <form action='login' method='POST'>
-                <input type='text' name='email' id='email' placeholder='email'></input>
-                <input type='password' name='password' id='password' placeholder='password'></input>
-                <input type='submit' name='submit'></input>
-               </form></br>
-	       <a href='/'>Home</a>
-               '''
+        return render_template('login.html')
+
     #The request method is POST (page is recieving data)
     email = flask.request.form['email']
     cursor = conn.cursor()
@@ -101,8 +95,7 @@ def login():
             return flask.redirect(flask.url_for('protected')) #protected is a function defined in this file
 
     #information did not match
-    return "<a href='/login'>Try again</a>\
-            </br><a href='/register'>or make an account</a>"
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
@@ -123,6 +116,7 @@ def register_user():
     try:
         email=request.form.get('email')
         password=request.form.get('password')
+        username=request.form.get('username')
     except:
         print "couldn't find all tokens" #this prints to shell, end users will not see this (all print statements go to shell)
         return flask.redirect(flask.url_for('register'))
@@ -135,7 +129,7 @@ def register_user():
         user = User()
         user.id = email
         flask_login.login_user(user)
-        return render_template('hello.html', name=email, message='Account Created!')
+        return render_template('hello.html', name=username, message='Account Created!')
     else:
         print "couldn't find all tokens"
         return flask.redirect(flask.url_for('register'))
@@ -159,11 +153,25 @@ def isEmailUnique(email):
     else:
         return True
 #end login code
+@app.route("/map", methods=['GET','POST'])
+@flask_login.login_required
+def MAP():
+    return render_template('routes-itWorks.html')
+
+
+@app.route("/mapadd", methods=['GET','POST'])
+def addMAP():
+    return render_template('set-barriers.html')
+
 
 @app.route('/profile')
 @flask_login.login_required
 def protected():
-    return render_template('hello.html', name=flask_login.current_user.id, message="Here's your profile")
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username   FROM Users WHERE user_id = {0}".format(uid))
+    username=cursor.fetchall()
+    return render_template('hello.html', name=username[0][0], message="Here's your profile")
 
 #begin photo uploading code
 # photos uploaded using base64 encoding so they can be directly embeded in HTML 
@@ -199,7 +207,7 @@ def upload_file():
 #default page  
 @app.route("/", methods=['GET'])
 def hello():
-    return render_template('hello.html', message='Welecome to Photoshare')
+    return render_template('hello.html', message='Welecome to Lets Roll!')
 
 
 if __name__ == "__main__":

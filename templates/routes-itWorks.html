@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title></title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.18/esri/css/esri.css">
+    <link rel="stylesheet" href="/static/styles/routes.css">
+    
+    <script
+      src="https://code.jquery.com/jquery-2.2.4.js"
+      integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
+      crossorigin="anonymous"></script>
+
+
+    <script src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBqXKRBUtKDvMColK_L34xgZjwpKw_fSfQ",
+        authDomain: "letsroll-a4a13.firebaseapp.com",
+        databaseURL: "https://letsroll-a4a13.firebaseio.com",
+        storageBucket: "letsroll-a4a13.appspot.com",
+        messagingSenderId: "969778792629"
+      };
+      firebase.initializeApp(config);
+    </script>
+
+    <script src="https://js.arcgis.com/3.18/"></script>
+    <script>
+      require([
+        "esri/map",
+        "esri/dijit/Geocoder",
+        "esri/graphic",
+        "esri/symbols/SimpleMarkerSymbol",
+        "esri/geometry/screenUtils",
+        "dojo/dom",
+        "dojo/dom-construct",
+        "dojo/query",
+        "dojo/_base/Color",
+
+        "esri/urlUtils",
+        "esri/geometry/Point",            
+        "esri/tasks/RouteTask",            
+        "esri/tasks/RouteParameters",
+
+        "esri/tasks/FeatureSet",           
+        "esri/symbols/SimpleLineSymbol",          
+
+        "esri/Color",
+        "dojo/on",
+        "dijit/registry",
+
+        "dojo/domReady!",
+        "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane",
+        "dijit/form/HorizontalSlider",
+        "dijit/form/HorizontalRuleLabels"
+      ], function(Map, Geocoder, Graphic, SimpleMarkerSymbol, screenUtils, dom, domConstruct, query, Color, urlUtils, Point, RouteTask, RouteParameters, FeatureSet, SimpleLineSymbol, Color, on, registry) {
+        
+        // create a map and instance of the geocoder widget here
+        var map = new Map("map", {
+          basemap: "streets", 
+          center : [-74.26527880132198, 40.50741287620034],
+          zoom: 16
+        });
+          
+        var startPoint = null, endPoint = null
+        var startPointGraphic = null, endPointGraphic = null
+        
+        var blue = new Color([0,0,255,0.5])
+        var green = new Color([0,255,0,0.5])
+
+        var start_geocoder =  new Geocoder({
+            arcgisGeocoder: {
+              placeholder: "Find a place"
+          }, 
+          autoComplete: true,
+          map: map
+        }, dom.byId("start"));
+          
+        var end_geocoder =  new Geocoder({
+          arcgisGeocoder: {
+            placeholder: "Find a place"
+          }, 
+          autoComplete: true,
+          map: map
+        }, dom.byId("end"));
+
+        map.on("load", enableSpotlight);
+
+        start_geocoder.on("select", showStartPoint);
+        start_geocoder.on("clear", removeSpotlight);
+
+        end_geocoder.on("select", showEndPoint);
+        end_geocoder.on("clear", removeSpotlight);
+
+        /** Routes **/
+
+        var routeTask, routeParams;
+        var map, stopSymbol, routeSymbol, lastStop;
+
+        var currentRoute = null      
+
+        routeTask = new RouteTask("https://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World?token=yjErQFxcqXpz5kWxsbuBimYr101sCOyP9ZOVgJjftACLahUzH_L7eC6J6D3RDbIiZUSxwAr3mzlQudXJkdWomQIvR0GRpFNryBVDgiLEAIdx5iN1bjriYWpb-75vp9vaKUfgsdgavcCDR8WsM3amHw..");
+
+        //setup the route parameters
+        routeParams = new RouteParameters();
+        routeParams.stops = new FeatureSet();
+        routeParams.barriers = new FeatureSet();
+        routeParams.outSpatialReference = {
+          "wkid" : 102100
+        };          
+
+        //define the symbology used to display the route
+        routeSymbol = new SimpleLineSymbol().setColor(new dojo.Color([0, 0, 255, 0.5])).setWidth(5);
+
+        barrierSymbol = new SimpleMarkerSymbol().setStyle(SimpleMarkerSymbol.STYLE_X).setSize(20);
+        barrierSymbol.outline.setWidth(3).setColor(new Color([255,0,0]));
+
+        function showStartPoint(evt) {
+          if (startPoint != null && startPointGraphic != null) {
+            map.graphics.remove(startPointGraphic)
+            routeParams.stops = new FeatureSet()
+            if (endPointGraphic != null)
+              routeParams.stop.features.push(endPointGraphic)
+          }
+
+          startPoint = evt.result.feature.geometry;
+          var symbol = new SimpleMarkerSymbol().setStyle(SimpleMarkerSymbol.STYLE_SQUARE).setColor(blue);
+          startPointGraphic = new Graphic(startPoint, symbol);
+          map.graphics.add(startPointGraphic);
+
+          createStopForRoute(startPointGraphic)
+
+          focusPoint(evt.result, startPoint)
+        }
+
+        function showEndPoint(evt) {
+          if (endPoint != null && endPointGraphic != null) {
+            map.graphics.remove(endPointGraphic)
+            routeParams.stops = new FeatureSet()
+            if (startPointGraphic != null)
+              routeParams.stop.features.push(startPointGraphic)
+          }
+
+          endPoint = evt.result.feature.geometry
+          var symbol = new SimpleMarkerSymbol().setStyle(SimpleMarkerSymbol.STYLE_SQUARE).setColor(green);
+          endPointGraphic = new Graphic(endPoint, symbol);
+          map.graphics.add(endPointGraphic);
+
+          createStopForRoute(endPointGraphic)
+
+          focusPoint(evt.result, endPoint)
+          console.log(routeParams.stops.features)
+        }
+
+        function focusPoint(eventResult, point) {
+
+          map.infoWindow.setTitle("Search Result");
+          map.infoWindow.setContent(eventResult.name);
+          map.infoWindow.show(point);
+
+          var spotlight = map.on("extent-change", function(extentChange) {
+            var geom = screenUtils.toScreenGeometry(map.extent, map.width, map.height, extentChange.extent);
+            var width = geom.xmax - geom.xmin;
+            var height = geom.ymin - geom.ymax;
+
+            var max = height;
+            if ( width > height )
+                max = width;
+
+            var margin = '-' + Math.floor(max/2) + 'px 0 0 -' + Math.floor(max/2) + 'px';
+
+            query(".spotlight").addClass("spotlight-active").style({
+              width: max + "px",
+              height: max + "px",
+              margin: margin
+            });
+            spotlight.remove();
+          });
+        } 
+
+        function enableSpotlight() {
+          var html = "<div id='spotlight' class='spotlight'></div>"
+          domConstruct.place(html, dom.byId("map_container"), "first");
+        }
+
+        function removeSpotlight() {
+          query(".spotlight").removeClass("spotlight-active");
+          map.infoWindow.hide();
+        }
+
+
+        firebase.database().ref('barriers').once('value')
+        .then(function(snapshot) {
+          var listBarriers = snapshot.val();
+          for (var id in listBarriers) {
+            var barrier = listBarriers[id]
+
+            var barrierGraphic = map.graphics.add(new Graphic(new Point(barrier.x,barrier.y, map.spatialReference), barrierSymbol));
+            routeParams.barriers.features.push(barrierGraphic);
+          }
+        })
+
+        routeTask.on("solve-complete", showRoute);
+        routeTask.on("error", errorHandler);     
+
+        $("#route").click(solveRoutes)
+
+        function solveRoutes() {
+          routeTask.solve(routeParams);
+        }
+
+        //Adds the solved route to the map as a graphic
+        function showRoute(evt) {
+          if (currentRoute !=  null)
+            map.graphics.remove(currentRoute)
+
+          currentRoute = evt.result.routeResults[0].route.setSymbol(routeSymbol)
+          map.graphics.add(currentRoute);
+        }
+
+        function createStopForRoute(stop) {
+          routeParams.stops.features.push(stop);
+        }
+
+        //Displays any error returned by the Route Task
+        function errorHandler(err) {
+          console.log(err.message)
+          alert("An error occured\n" + err.message + "\n" + err.details.join("\n"));
+
+          routeParams.stops.features.splice(0, 0, lastStop);
+          map.graphics.remove(routeParams.stops.features.splice(1, 1)[0]);
+        }
+
+      });
+       
+    </script>
+  </head>
+  <body class="soria">
+      <h1><script>
+           
+          </script></h1>
+    <div id="start"></div>
+    <div id="end"></div>
+    <button id="route">Get Route</button>
+    <div id="map"></div>   
+  </body> 
+</html>

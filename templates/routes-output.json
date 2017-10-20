@@ -1,0 +1,180 @@
+{
+    "checksum": "aYdEAHd3RAA.", 
+    "directions": [
+        {
+            "features": [
+                {
+                    "attributes": {
+                        "ETA": -2209161600000, 
+                        "arriveTimeUTC": -2209161600000, 
+                        "length": 0, 
+                        "maneuverType": "esriDMTDepart", 
+                        "text": "Start at Location 1", 
+                        "time": 0
+                    }, 
+                    "compressedGeometry": "+bd6bc-1bkv4en+df6i90+0+0"
+                }, 
+                {
+                    "attributes": {
+                        "ETA": -2209161600000, 
+                        "arriveTimeUTC": -2209161600000, 
+                        "length": 0.0978174826854706, 
+                        "maneuverType": "esriDMTStraight", 
+                        "text": "Go southeast on 5th St toward Stevenson St", 
+                        "time": 0.7190567572836881
+                    }, 
+                    "compressedGeometry": "+bd6bc-1bkv4en+df6i90+3bs-2o3+2m1-1vi+8kn-70c"
+                }, 
+                {
+                    "attributes": {
+                        "ETA": -2209161600000, 
+                        "arriveTimeUTC": -2209161600000, 
+                        "length": 0.17285850406321857, 
+                        "maneuverType": "esriDMTTurnLeft", 
+                        "text": "Turn left on Mission St", 
+                        "time": 1.017032041597448
+                    }, 
+                    "compressedGeometry": "+bd6bc-1bkulo3+df66gv+3rd+2tg+2tg+2ap+62f+4pa+2eh+1vj+ao1+8of"
+                }, 
+                {
+                    "attributes": {
+                        "ETA": -2209161600000, 
+                        "arriveTimeUTC": -2209161600000, 
+                        "length": 0.12087382287627046, 
+                        "maneuverType": "esriDMTTurnRight", 
+                        "text": "Turn right on 4th St", 
+                        "time": 0.8808320560088115
+                    }, 
+                    "compressedGeometry": "+bd6bc-1bktrm5+df6rak+b70-93m+70c-5fp"
+                }, 
+                {
+                    "attributes": {
+                        "ETA": -2209161600000, 
+                        "arriveTimeUTC": -2209161600000, 
+                        "length": 0.10957616044719792, 
+                        "maneuverType": "esriDMTTurnRight", 
+                        "text": "Turn right on Howard St", 
+                        "time": 0.6105609147575085
+                    }, 
+                    "compressedGeometry": "+bd6bc-1bkt9ep+df6cn5-gig-d2m"
+                }, 
+                {
+                    "attributes": {
+                        "ETA": -2209161600000, 
+                        "arriveTimeUTC": -2209161600000, 
+                        "length": 0, 
+                        "maneuverType": "esriDMTStop", 
+                        "text": "Finish at Location 2, on the left", 
+                        "time": 0
+                    }, 
+                    "compressedGeometry": "+bd6bc-1bktq19+df5vkf+0+0"
+                }
+            ], 
+            "routeId": 1, 
+            "routeName": "Location 1 - Location 2", 
+            "summary": {
+                "envelope": {
+                    "spatialReference": {
+                        "latestWkid": 4326, 
+                        "wkid": 4326
+                    }, 
+                    "xmax": -122.40269999999998, 
+                    "xmin": -122.40789999999998, 
+                    "ymax": 37.78452000000004, 
+                    "ymin": 37.78200000000004
+                }, 
+                "totalDriveTime": 3.227481769647456, 
+                "totalLength": 0.5011259700721575, 
+                "totalTime": 3.2274817710276693
+            }
+        }
+    ], 
+    "messages": [], 
+    "routes": {
+        "features": [
+            {
+                "attributes": {
+                    "FirstStopID": 1, 
+                    "LastStopID": 2, 
+                    "Name": "Location 1 - Location 2", 
+                    "ObjectID": 1, 
+                    "Shape_Length": 0.00827098610120051, 
+                    "StopCount": 2, 
+                    "Total_Kilometers": 0.8064770574162252, 
+                    "Total_Miles": 0.5011216106787768, 
+                    "Total_TravelTime": 3.227481769647456
+                }, 
+                "geometry": {
+                    "paths": [
+                        [
+                            [
+                                -122.40774845199996, 
+                                37.783745569000075
+                            ], 
+                            [
+                                -122.40745999999996, 
+                                37.783510000000035
+                            ], 
+                            [
+                                -122.40722999999997, 
+                                37.78334000000007
+                            ], 
+                            [
+                                -122.40648999999996, 
+                                37.78274000000005
+                            ], 
+                            [
+                                -122.40615999999994, 
+                                37.78299000000004
+                            ], 
+                            [
+                                -122.40590999999995, 
+                                37.78319000000005
+                            ], 
+                            [
+                                -122.40538999999995, 
+                                37.783600000000035
+                            ], 
+                            [
+                                -122.40517999999997, 
+                                37.78377000000006
+                            ], 
+                            [
+                                -122.40425999999997, 
+                                37.78452000000004
+                            ], 
+                            [
+                                -122.40329999999994, 
+                                37.78374000000008
+                            ], 
+                            [
+                                -122.40269999999998, 
+                                37.78327000000007
+                            ], 
+                            [
+                                -122.40411865599998, 
+                                37.78215034300007
+                            ]
+                        ]
+                    ]
+                }
+            }
+        ], 
+        "fieldAliases": {
+            "FirstStopID": "FirstStopID", 
+            "LastStopID": "LastStopID", 
+            "Name": "Name", 
+            "ObjectID": "ObjectID", 
+            "Shape_Length": "Shape_Length", 
+            "StopCount": "StopCount", 
+            "Total_Kilometers": "Total_Kilometers", 
+            "Total_Miles": "Total_Miles", 
+            "Total_TravelTime": "Total_TravelTime"
+        }, 
+        "geometryType": "esriGeometryPolyline", 
+        "spatialReference": {
+            "latestWkid": 4326, 
+            "wkid": 4326
+        }
+    }
+}

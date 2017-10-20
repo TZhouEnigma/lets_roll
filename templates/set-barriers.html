@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Set Barriers</title>
+
+    <style>
+      #map {
+        display: inline-block;
+        width: 50vw;
+        height: 70vh;
+        border: 1px solid #000;
+        margin-left: 3%;
+        margin-top: 2%;
+        border:1px solid #000;
+      }
+      #barrier-panel {
+        display: inline-block;
+        float: right;
+        height: 600px;
+          vertical-align: middle;
+      }
+      #submit {
+        display: block;
+      }
+        
+    </style>
+
+<script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/3.18/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.18/esri/css/esri.css">
+  
+    <script src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBqXKRBUtKDvMColK_L34xgZjwpKw_fSfQ",
+        authDomain: "letsroll-a4a13.firebaseapp.com",
+        databaseURL: "https://letsroll-a4a13.firebaseio.com",
+        storageBucket: "letsroll-a4a13.appspot.com",
+        messagingSenderId: "969778792629"
+      };
+      firebase.initializeApp(config);
+    </script>
+
+    <script src="https://js.arcgis.com/3.18/"></script>
+    <script>
+      require([
+        "esri/urlUtils",
+        "esri/map",
+        "esri/graphic",
+        "esri/geometry/Point",
+
+        "esri/tasks/FeatureSet",            
+        "esri/symbols/SimpleMarkerSymbol",
+        "esri/symbols/SimpleLineSymbol",          
+
+        "esri/Color",
+        "dojo/on",
+        "dijit/registry",
+
+        "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane",
+        "dijit/form/HorizontalSlider",
+        "dijit/form/HorizontalRuleLabels"
+      ], function (
+        urlUtils, Map, Graphic, Point,
+        FeatureSet, SimpleMarkerSymbol, SimpleLineSymbol,           
+        Color, on, registry
+      ) {
+
+        var map, barrierSymbol
+        var selectedMapPoint
+
+        map = new Map("map", {
+            basemap : "streets",
+            center : [-74.26527880132198, 40.50741287620034],
+            zoom : 17
+          });
+
+
+        map.on("click", addBarrier);         
+
+        barrierSymbol = new SimpleMarkerSymbol().setStyle(SimpleMarkerSymbol.STYLE_X).setSize(20);
+        barrierSymbol.outline.setWidth(3).setColor(new Color([255,0,0]));
+
+
+        //Adds a graphic when the user clicks the map. If 2 or more points exist, route is solved.
+        function addBarrier(evt) {
+          console.log(evt.mapPoint.x + ' - ' + evt.mapPoint.y)
+
+          var barrier = map.graphics.add(new Graphic(evt.mapPoint, barrierSymbol));
+          selectedMapPoint = evt.mapPoint
+        }
+
+        $("#submit").click(function() {
+          firebase.database().ref('barriers').push({
+            x: selectedMapPoint.x,
+            y: selectedMapPoint.y,
+            comment: $("#comment").val()
+          })
+        })
+       });
+    
+    </script>
+ <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+  <body class="claro">
+   
+  
+<div class="container-fluid">
+    <div class="row">    
+     <h1>mark this area</h1>
+    <div id="map" class="col-sm-7 col-md-6 col-lg-5"></div>
+    
+   
+     <div id="barrier-panel"  class="col-sm-5 col-md-6 col-lg-5">
+      <label for="comment" style="vertical-align:top">Comment:</label>
+      <textarea
+        id="comment" 
+        placeholder="Comment about the area"
+        rows="3"
+        cols="50"  
+      >          
+      
+      </textarea>
+      <button id="submit" class="btn btn-info" style="position:absolute;float:left">Submit</button>
+      
+     </div>
+  </div>
+   </div>
+    
+  
+     
+  </body>
+</html>
